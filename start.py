@@ -7,6 +7,10 @@ import time
 from ProxyServer import ProxyServer
 from pyquery import PyQuery as pq
 from selenium import webdriver
+from selenium.webdriver.common.proxy import Proxy
+from selenium.webdriver.common.proxy import ProxyType
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver import DesiredCapabilities
 # 模拟请求user_agent
 header = {}
 # 设置代理
@@ -70,13 +74,15 @@ class Http():
         http.setHeader()
         # 设置代理
         proxies = http.setProxyServer()
+        print(proxies)
         # 检测代理状态
         status = http.checkProxyServer(proxies)
+        print(status)
         if status == True:
             print('代理检测通过')
-        else:
-            ProxyServer()
-            self.runProxyServer()
+        #else:
+            #ProxyServer()
+            #self.runProxyServer()
     
 class Wechat():
     # 搜索公众号,获取公众号地址
@@ -87,17 +93,48 @@ class Wechat():
     
     # 打开微信公众号
     def getWechatHtml(self,url):
-        browser = webdriver.PhantomJS() 
-        browser.get(url) 
-        time.sleep(3) 
+        proxy = Proxy({
+            'proxyType': ProxyType.MANUAL,
+            'httpProxy': '27.220.52.128:4513'  # 代理ip和端口
+        })
+        desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
+        # 把代理ip加入到技能中
+        proxy.add_to_capabilities(desired_capabilities)
+        driver = webdriver.PhantomJS(
+            executable_path="./phantomjs.exe",
+            desired_capabilities=desired_capabilities
+        )
+
+        driver.get(url)
+        time.sleep(10)
+        result = driver.execute_script("return document.documentElement.outerHTML")
+        driver.close()
+        return result
+        #result = requests.get(url, proxies=proxies,headers=header,timeout=5)
+        #service_args = [
+        #    '--proxy=114.231.4.207:45361',    # 代理 IP：prot    （eg：192.168.0.28:808）
+        #    '--proxy-type=http',            # 代理类型：http/https
+        #]
+        #user_agent = (
+        #    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) " +
+        #    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.57 Safari/537.36"
+        #)
+        #dcap = dict(DesiredCapabilities.PHANTOMJS)
+        #dcap["phantomjs.page.settings.userAgent"] = user_agent
+       # browser = webdriver.PhantomJS(executable_path='D:\tools\桌面\demo\phantomjs.exe',desired_capabilities=dcap,service_args=service_args)
+       # print(browser.get(url))
+        #doc = pq(result.content)
+        #articles = doc('div[class="weui_msg_card"]')
+        #print(articles)
+        #print(result.execute_script("return document.documentElement.outerHTML"))
         # 执行js得到整个dom 
-        return browser.execute_script("return document.documentElement.outerHTML")
+        #return browser.execute_script("return document.documentElement.outerHTML"
     
     # 获取文章列表
     def getArticleList(self,html):
         doc = pq(html)
         articles = doc('div[class="weui_msg_card"]')
-        print(articles)
+        print(html)
         #articles_list = []
         #i = 1
         #for article in articles.items():
@@ -119,14 +156,14 @@ if __name__ == '__main__':
     
     # 调用http
     http = Http()
-    http.runProxyServer()
+    #http.runProxyServer()
     
     # 调用微信
     wechat = Wechat()
     # 搜索公众号，获取公众号地址
-    wechatUrl = wechat.searchWechat()
+    #wechatUrl = wechat.searchWechat()
+    wechatUrl = 'http://mp.weixin.qq.com/profile?src=3&timestamp=1546364229&ver=1&signature=ORJFHpC7fJwYHXfYiDRWDGE5BGmRrWLNtF4TG5MYY9K2lIVkSkfpGLeCU1dDRfmLdX4X8LqYTr8uBYoBDKALHQ=='
     html = wechat.getWechatHtml(wechatUrl)
-    print(html)
     wechat.getArticleList(html)
     
     
