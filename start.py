@@ -95,7 +95,7 @@ class Wechat():
     def getWechatHtml(self,url):
         proxy = Proxy({
             'proxyType': ProxyType.MANUAL,
-            'httpProxy': '27.220.52.128:4513'  # 代理ip和端口
+            'httpProxy': '112.195.204.87:4526'  # 代理ip和端口
         })
         desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
         # 把代理ip加入到技能中
@@ -106,35 +106,19 @@ class Wechat():
         )
 
         driver.get(url)
-        time.sleep(10)
+        time.sleep(3)
+        #print(driver.find_elements_by_xpath('//div[@class="weui_msg_card_list"]'))
+        #time.sleep(5)
         result = driver.execute_script("return document.documentElement.outerHTML")
+        print(result)
         driver.close()
-        return result
-        #result = requests.get(url, proxies=proxies,headers=header,timeout=5)
-        #service_args = [
-        #    '--proxy=114.231.4.207:45361',    # 代理 IP：prot    （eg：192.168.0.28:808）
-        #    '--proxy-type=http',            # 代理类型：http/https
-        #]
-        #user_agent = (
-        #    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) " +
-        #    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.57 Safari/537.36"
-        #)
-        #dcap = dict(DesiredCapabilities.PHANTOMJS)
-        #dcap["phantomjs.page.settings.userAgent"] = user_agent
-       # browser = webdriver.PhantomJS(executable_path='D:\tools\桌面\demo\phantomjs.exe',desired_capabilities=dcap,service_args=service_args)
-       # print(browser.get(url))
-        #doc = pq(result.content)
-        #articles = doc('div[class="weui_msg_card"]')
-        #print(articles)
-        #print(result.execute_script("return document.documentElement.outerHTML"))
-        # 执行js得到整个dom 
-        #return browser.execute_script("return document.documentElement.outerHTML"
+        #return result
     
     # 获取文章列表
     def getArticleList(self,html):
-        doc = pq(html)
-        articles = doc('div[class="weui_msg_card"]')
-        print(html)
+        pass
+        #doc = pq(html)
+        #articles = doc('div[class="weui_msg_card"]')
         #articles_list = []
         #i = 1
         #for article in articles.items():
@@ -162,7 +146,7 @@ if __name__ == '__main__':
     wechat = Wechat()
     # 搜索公众号，获取公众号地址
     #wechatUrl = wechat.searchWechat()
-    wechatUrl = 'http://mp.weixin.qq.com/profile?src=3&timestamp=1546364229&ver=1&signature=ORJFHpC7fJwYHXfYiDRWDGE5BGmRrWLNtF4TG5MYY9K2lIVkSkfpGLeCU1dDRfmLdX4X8LqYTr8uBYoBDKALHQ=='
+    wechatUrl = 'http://mp.weixin.qq.com/profile?src=3&timestamp=1546386066&ver=1&signature=ORJFHpC7fJwYHXfYiDRWDGE5BGmRrWLNtF4TG5MYY9K2lIVkSkfpGLeCU1dDRfmL1mJ7JdCHkKm6jSqkFSBjNA=='
     html = wechat.getWechatHtml(wechatUrl)
     wechat.getArticleList(html)
     
